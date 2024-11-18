@@ -1,9 +1,6 @@
 package engine;
 
-import entity.EnemyShip;
-import entity.EnemyShipFormation;
-import entity.Ship;
-import entity.Barrier;
+import entity.*;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -36,7 +33,8 @@ public class ItemManager {
     private static final int GHOST_COOLDOWN = 3000;
     /** Cooldown of Time-stop */
     private static final int TIMESTOP_COOLDOWN = 4000;
-
+    /** Max Speed */
+    private final float MAX_SPEED = 3.0f;
     /** Random generator. */
     private final Random rand;
     /** Player's ship. */
@@ -68,6 +66,7 @@ public class ItemManager {
         Barrier,
         Ghost,
         TimeStop,
+        SpeedUp,
         MultiShot
     }
 
@@ -110,9 +109,9 @@ public class ItemManager {
         ItemType[] itemTypes = ItemType.values();
 
         if (isMaxShotNum)
-            return itemTypes[rand.nextInt(5)];
+            return itemTypes[rand.nextInt(6)];
 
-        return itemTypes[rand.nextInt(6)];
+        return itemTypes[rand.nextInt(7)];
     }
 
     /**
@@ -131,7 +130,9 @@ public class ItemManager {
             case Barrier -> operateBarrier();
             case Ghost -> operateGhost();
             case TimeStop -> operateTimeStop();
+            case SpeedUp -> operateSpeedUp();
             case MultiShot -> operateMultiShot();
+
         };
     }
 
@@ -302,6 +303,30 @@ public class ItemManager {
             }
         }
 
+        return null;
+    }
+    /**
+     * Operate Speed-Up item.
+     *
+     * @return null
+     */
+    private Entry<Integer, Integer> operateSpeedUp() {
+        ShipMultipliers currentMultipliers = ship.getMultipliers();
+        float newSpeedMultiplier = currentMultipliers.speed() + 0.1f;
+
+        if(newSpeedMultiplier >  MAX_SPEED) {
+            logger.info("Speed-Up not applied. Speed multiplier is already at maximum: " + MAX_SPEED);
+            return null;
+        }
+        ShipMultipliers updatedMultipliers = new ShipMultipliers(
+                newSpeedMultiplier,
+                currentMultipliers.bulletSpeed(),
+                currentMultipliers.shootingInterval()
+        );
+
+        ship.updateMultipliers(updatedMultipliers);
+
+        logger.info("Speed-Up activated. New speed multiplier: " + newSpeedMultiplier);
         return null;
     }
 

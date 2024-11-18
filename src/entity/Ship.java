@@ -30,7 +30,7 @@ public abstract class Ship extends Entity {
 	private Cooldown soundCooldown;
 
 	/** Multipliers for the ship's properties. */
-	protected final ShipMultipliers multipliers;
+	protected ShipMultipliers multipliers;
 	/** Name of the ship. */
 	public final String name;
 	/** Type of sprite to be drawn. */
@@ -133,6 +133,14 @@ public abstract class Ship extends Entity {
 	}
 
 	/**
+	 * Updates the ship's multipliers.
+	 *
+	 * @param newMultipliers The new multipliers to apply to the ship.
+	 */
+	public void updateMultipliers(ShipMultipliers newMultipliers) {
+		setMultipliers(newMultipliers);
+	}
+	/**
 	 * Shoots a bullet upwards.
 	 * 
 	 * @param bullets
@@ -228,6 +236,16 @@ public abstract class Ship extends Entity {
 		return Math.round(BULLET_SPEED * this.multipliers.bulletSpeed());
 	}
 
+
+	// Getter
+	public ShipMultipliers getMultipliers() {
+		return multipliers;
+	}
+
+	// Setter
+	public void setMultipliers(ShipMultipliers multipliers) {
+		this.multipliers = multipliers;
+	}
 	/**
 	 * Getter for the ship's shooting interval.
 	 * @return Time between shots.
