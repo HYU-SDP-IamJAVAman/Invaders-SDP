@@ -15,7 +15,7 @@ import engine.SoundManager;
  * @author <a href="mailto:RobertoIA1987@gmail.com">Roberto Izquierdo Amo</a>
  * 
  */
-public abstract class Ship extends Entity {
+public class Ship extends Entity {
 
 	/** Time between shots. */
 	private static int SHOOTING_INTERVAL = 750;
@@ -67,7 +67,7 @@ public abstract class Ship extends Entity {
 	 * 		      Type of sprite to be drawn.
 	 * 		      @see SpriteType
 	 */
-	protected Ship(final int positionX, final int positionY,
+	public Ship(final int positionX, final int positionY,
 				   final String name, final ShipMultipliers multipliers,
 				   final SpriteType spriteType) {
 		super(positionX, positionY, 13 * 2, 8 * 2, Color.GREEN);
