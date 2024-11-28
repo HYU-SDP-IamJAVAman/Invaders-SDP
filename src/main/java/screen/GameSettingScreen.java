@@ -230,6 +230,7 @@ public class GameSettingScreen extends Screen {
 
 		drawManager.drawGameSettingElements(this, this.selectedRow, isMultiplayer, name1, name2,this.difficultyLevel, this.gameMode);
 
+
 		drawManager.completeDrawing(this);
 
 		Core.setLevelSetting(this.difficultyLevel);

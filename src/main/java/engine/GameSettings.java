@@ -24,7 +24,7 @@ public class GameSettings {
 	private int gameMode;
 	/**
 	 * Constructor.
-	 *
+	 * 
 	 * @param formationWidth
 	 *            Width of the level's enemy formation.
 	 * @param formationHeight
@@ -42,7 +42,6 @@ public class GameSettings {
 		this.formationWidth = formationWidth;
 		this.formationHeight = formationHeight;
 		this.baseSpeed = baseSpeed;
-		this.shootingFrequency = shootingFrequency;
 		this.gameMode = gameMode;
 	}
 
@@ -50,7 +49,6 @@ public class GameSettings {
 		this.formationWidth = gameSettings.formationWidth;
 		this.formationHeight = gameSettings.formationHeight;
 		this.baseSpeed = gameSettings.baseSpeed;
-		this.shootingFrequency = gameSettings.shootingFrequency;
 		this.gameMode = gameSettings.gameMode;
 	}
 
@@ -79,7 +77,6 @@ public class GameSettings {
 	 * @return the shootingFrecuency
 	 */
 	public final int getShootingFrecuency() {
-		return shootingFrequency;
 	}
 
 	/**
