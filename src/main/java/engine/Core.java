@@ -44,7 +44,7 @@ public final class Core {
 	/** Logger handler for printing to console. */
 	private static ConsoleHandler consoleHandler;
 	/** Initialize singleton instance of SoundManager and return that */
-	private static SoundManager soundManager;
+	private static final SoundManager soundManager = SoundManager.getInstance();
 
 	private static long startTime, endTime;
 
@@ -71,8 +71,6 @@ public final class Core {
 			LOGGER.addHandler(consoleHandler);
 			LOGGER.setLevel(Level.ALL);
 
-			soundManager = SoundManager.getInstance();
-
 		} catch (Exception e) {
 			// TODO handle exception
 			e.printStackTrace();
@@ -90,6 +88,7 @@ public final class Core {
 
 		int returnCode = 1;
 		do {
+//			setLivesByDifficulty(DifficultySetting);
 			if(GameModeSetting == 2) { // Survival mode
 				MAX_LIVES = 1;
 			} else {
@@ -140,8 +139,6 @@ public final class Core {
 					endTime = System.currentTimeMillis();
 					achievementManager.updatePlaying(gameState.getMaxCombo(),(int) (endTime - startTime) / 1000, MAX_LIVES, gameState.getLivesRemaining(), gameState.getLevel()-1);
 				} while (gameState.getLivesRemaining() > 0);
-
-				// After the game ends
 				achievementManager.updatePlayed(gameState.getAccuracy(), gameState.getScore());
                 achievementManager.updateAllAchievements();
 				LOGGER.info("Starting " + WIDTH + "x" + HEIGHT
