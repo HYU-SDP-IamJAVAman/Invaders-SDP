@@ -114,7 +114,7 @@ public final class Core {
 					startTime = System.currentTimeMillis();
 					boolean bonusLife = gameState.getLevel()
 							% EXTRA_LIFE_FRECUENCY == 0
-							&& gameState.getLivesRemaining() < MAX_LIVES && GameModeSetting != 2;
+							&& gameState.getLivesRemaining() < MAX_LIVES;
 					LOGGER.info("difficulty is " + DifficultySetting);
 					//add variation
 					gameSetting = gameSetting.LevelSettings(gameSetting.getFormationWidth(),
@@ -138,8 +138,6 @@ public final class Core {
 					endTime = System.currentTimeMillis();
 					achievementManager.updatePlaying(gameState.getMaxCombo(),(int) (endTime - startTime) / 1000, MAX_LIVES, gameState.getLivesRemaining(), gameState.getLevel()-1);
 				} while (gameState.getLivesRemaining() > 0);
-
-				// After the game ends
 				achievementManager.updatePlayed(gameState.getAccuracy(), gameState.getScore());
                 achievementManager.updateAllAchievements();
 				LOGGER.info("Starting " + WIDTH + "x" + HEIGHT
@@ -324,5 +322,27 @@ public final class Core {
 
 	public static int getGameModeSetting() {
 		return GameModeSetting;
+	}
+
+	/**
+	 * @param difficulty MAX_LIVES based on difficulty
+	 */
+	public static void setLivesByDifficulty(int difficulty) {
+		Wallet wallet = Wallet.getWallet();
+		switch (difficulty) {
+			case 0: // EASY
+				MAX_LIVES = wallet.getLives_lv() + 2;
+				break;
+			case 1: // NORMAL
+				if(wallet.getLives_lv() > 2) {
+					MAX_LIVES = 3;
+				} else {
+					MAX_LIVES = wallet.getLives_lv() + 1;
+				}
+				break;
+			case 2: // HARD
+				MAX_LIVES = 1;
+				break;
+		}
 	}
 }
