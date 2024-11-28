@@ -210,6 +210,7 @@ public class GameSettings {
 		this.shootingFrequency = Math.max(shootingFrequency - frequencyDecrement, MIN_FREQUENCY);
 	}
 
+
 	/**
 	 * @return difficulty
 	 */
