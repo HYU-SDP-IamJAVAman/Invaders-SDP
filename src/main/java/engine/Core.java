@@ -88,7 +88,7 @@ public final class Core {
 
 		int returnCode = 1;
 		do {
-			MAX_LIVES = wallet.getLives_lv()+2;
+			setLivesByDifficulty(DifficultySetting);
 			gameState = new GameState(1, 0, BASE_SHIP, MAX_LIVES, 0, 0, 0, "", 0, 0, 0 ,0, 0);
 			achievementManager = new AchievementManager();
 
@@ -310,5 +310,27 @@ public final class Core {
 
 	public static int getLevelSetting(){
 		return DifficultySetting;
+	}
+
+	/**
+	 * @param difficulty MAX_LIVES based on difficulty
+	 */
+	public static void setLivesByDifficulty(int difficulty) {
+		Wallet wallet = Wallet.getWallet();
+		switch (difficulty) {
+			case 0: // EASY
+				MAX_LIVES = wallet.getLives_lv() + 2;
+				break;
+			case 1: // NORMAL
+				if(wallet.getLives_lv() > 2) {
+					MAX_LIVES = 3;
+				} else {
+					MAX_LIVES = wallet.getLives_lv() + 1;
+				}
+				break;
+			case 2: // HARD
+				MAX_LIVES = 1;
+				break;
+		}
 	}
 }
