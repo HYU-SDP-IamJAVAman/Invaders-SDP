@@ -49,6 +49,8 @@ public final class Core {
 	private static long startTime, endTime;
 
 	private static int DifficultySetting;// <- setting EASY(0), NORMAL(1), HARD(2);
+	/** Initialize HTTP ServerSocket */
+	public static ServerSocket serverSocket;
 
 
 	/**
@@ -71,6 +73,8 @@ public final class Core {
 			LOGGER.addHandler(consoleHandler);
 			LOGGER.setLevel(Level.ALL);
 
+			serverSocket = new ServerSocket();
+
 		} catch (Exception e) {
 			// TODO handle exception
 			e.printStackTrace();
@@ -86,7 +90,7 @@ public final class Core {
 		AchievementManager achievementManager;
 		Wallet wallet = Wallet.getWallet();
 
-		int returnCode = 1;
+		int returnCode = 9;
 		do {
 			setLivesByDifficulty(DifficultySetting);
 			gameState = new GameState(1, 0, BASE_SHIP, MAX_LIVES, 0, 0, 0, "", 0, 0, 0 ,0, 0);
@@ -145,6 +149,7 @@ public final class Core {
 						+ gameState.getShipsDestroyed() + " ships destroyed.");
 				currentScreen = new ScoreScreen(GameSettingScreen.getName(0), width, height, FPS, gameState, wallet, achievementManager, false);
 
+				serverSocket.sendUserState(serverSocket.nickname, gameState.getScore(), wallet.getCoin());
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing score screen.");
 				break;
@@ -221,6 +226,14 @@ public final class Core {
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing score screen.");
 				break;
+				case 9:
+					while(true) {
+						if (serverSocket.requestSignup() == 200 && serverSocket.requestLogin() == 200){
+							returnCode = 1;
+							break;
+						}
+
+					}
 			default:
 				break;
 			}
