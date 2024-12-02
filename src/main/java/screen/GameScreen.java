@@ -289,7 +289,7 @@ public class GameScreen extends Screen implements Callable<GameState> {
 		this.bullets = new HashSet<>();
 		this.barriers = new HashSet<>();
         this.itemBoxes = new HashSet<>();
-		this.itemManager = new ItemManager(this.ship, this.enemyShipFormation, this.barriers, this.height, this.width, this.balance);
+		this.itemManager = new ItemManager(this.ship, this.enemyShipFormation, this.barriers, this.width, this.height, this.balance);
 
 		// Special input delay / countdown.
 		this.gameStartTime = System.currentTimeMillis();
