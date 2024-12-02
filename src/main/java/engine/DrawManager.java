@@ -8,16 +8,11 @@ import java.awt.Graphics;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics2D;
-import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 
 import entity.*;
-import screen.GameSettingScreen;
 import screen.Screen;
 
 /**
@@ -63,16 +58,10 @@ public final class DrawManager {
 	/** Sprite types mapped to their images. */
 	private static Map<SpriteType, boolean[][]> spriteMap;
 
-	/** For Shopscreen image */
-	private static BufferedImage img_additionallife;
-	private static BufferedImage img_bulletspeed;
-	private static BufferedImage img_coin;
-	private static BufferedImage img_coingain;
-	private static BufferedImage img_shotinterval;
-
+	private static Map<ImageType, BufferedImage> imageMap;
 
 	/** Sprite types. */
-	public static enum SpriteType {
+	public enum SpriteType {
 		/** Player ship. */
 		Ship,
 		/** Destroyed player ship. */
@@ -127,6 +116,14 @@ public final class DrawManager {
 		EnemyShipF1
 	};
 
+	public enum ImageType {
+		AdditionalLife,
+		BulletSpeed,
+		Coin,
+		CoinGain,
+		ShotInterval,
+	}
+
 	/**
 	 * Private constructor.
 	 */
@@ -136,7 +133,7 @@ public final class DrawManager {
 		logger.info("Started loading resources.");
 
 		try {
-			spriteMap = new LinkedHashMap<SpriteType, boolean[][]>();
+			spriteMap = new LinkedHashMap<>();
 
 			spriteMap.put(SpriteType.Ship, new boolean[13][8]);
 			spriteMap.put(SpriteType.ShipDestroyed, new boolean[13][8]);
@@ -174,23 +171,22 @@ public final class DrawManager {
 			fontBig = fileManager.loadFont(24f);
 			logger.info("Finished loading the fonts.");
 
+			// Image loading.
+			Map<ImageType, String> imagePathMap = new EnumMap<>(ImageType.class);
+			imagePathMap.put(ImageType.AdditionalLife, "image/additional life.jpg");
+			imagePathMap.put(ImageType.BulletSpeed, "image/bullet speed.jpg");
+			imagePathMap.put(ImageType.Coin, "image/coin.jpg");
+			imagePathMap.put(ImageType.CoinGain, "image/coin gain.jpg");
+			imagePathMap.put(ImageType.ShotInterval, "image/shot interval.jpg");
+
+			imageMap = fileManager.loadImage(imagePathMap);
+			logger.info("Finished loading the images.");
+
 		} catch (IOException e) {
 			logger.warning("Loading failed.");
 		} catch (FontFormatException e) {
 			logger.warning("Font formating failed.");
 		}
-
-		/** Shop image load*/
-		try{
-			img_additionallife = ImageIO.read(new File("res/image/additional life.jpg"));
-			img_bulletspeed = ImageIO.read(new File("res/image/bullet speed.jpg"));
-			img_coin = ImageIO.read(new File("res/image/coin.jpg"));
-			img_coingain = ImageIO.read(new File("res/image/coin gain.jpg"));
-			img_shotinterval = ImageIO.read(new File("res/image/shot interval.jpg"));
-		} catch (IOException e) {
-			logger.info("Shop image loading failed");
-		}
-
 	}
 
 	/**
@@ -235,9 +231,6 @@ public final class DrawManager {
 		fontSmallMetrics = backBufferGraphics.getFontMetrics(fontSmall);
 		fontRegularMetrics = backBufferGraphics.getFontMetrics(fontRegular);
 		fontBigMetrics = backBufferGraphics.getFontMetrics(fontBig);
-
-		//drawBorders(screen);
-		//drawGrid(screen);
 	}
 	/**
 	 * First part of the drawing process in thread. Initializes buffers each thread, draws the
@@ -1900,6 +1893,12 @@ public final class DrawManager {
 		String shopString = "Shop";
 		int shopStringY = Math.round(screen.getHeight() * 0.15f);
 
+		ImageType selectedItem = switch (option) {
+            case 1 -> ImageType.BulletSpeed;
+            case 2 -> ImageType.ShotInterval;
+            case 3 -> ImageType.AdditionalLife;
+            default -> ImageType.CoinGain;
+        };
 
 		String coinString = ":  " + wallet.getCoin();
 		String exitString = "PRESS \"ESC\" TO RETURN TO MAIN MENU";
@@ -1907,8 +1906,6 @@ public final class DrawManager {
 
 		String[] itemString = new String[]{"BULLET SPEED", "SHOT INTERVAL", "ADDITIONAL LIFE","COIN GAIN"};
 		int[] walletLevel = new int[]{wallet.getBullet_lv(), wallet.getShot_lv(), wallet.getLives_lv(), wallet.getCoin_lv()};
-
-		BufferedImage[] itemImages = new BufferedImage[]{img_bulletspeed,img_shotinterval,img_additionallife,img_coingain};
 
 		int imgstartx = screen.getWidth()/80*23;
 		int imgstarty = screen.getHeight()/80*27;
@@ -1923,7 +1920,7 @@ public final class DrawManager {
 
 		backBufferGraphics.setColor(Color.GREEN);
 		drawCenteredBigString(screen, shopString, shopStringY);
-		backBufferGraphics.drawImage(img_coin, screen.getWidth()/80*39-(coinString.length()-3)*screen.getWidth()/80,screen.getHeight()/80*18,coinSize,coinSize,null);
+		backBufferGraphics.drawImage(imageMap.get(ImageType.Coin), screen.getWidth()/80*39-(coinString.length()-3)*screen.getWidth()/80,screen.getHeight()/80*18,coinSize,coinSize,null);
 		backBufferGraphics.setColor(Color.WHITE);
 		backBufferGraphics.setFont(fontRegular);
 		backBufferGraphics.drawString(coinString,screen.getWidth()/80*44-(coinString.length()-3)*screen.getWidth()/80,screen.getHeight()/80*20);
@@ -1947,8 +1944,8 @@ public final class DrawManager {
 		}
 
 		backBufferGraphics.setColor(Color.WHITE);
-		backBufferGraphics.drawImage(itemImages[option-1],imgstartx,imgstarty + (imgdis*(option-1)),50,40,null);
-		backBufferGraphics.drawImage(img_coin,coinstartx,coinstarty + (coindis*(option-1)),coinSize,coinSize,null);
+		backBufferGraphics.drawImage(imageMap.get(selectedItem),imgstartx,imgstarty + (imgdis*(option-1)),50,40,null);
+		backBufferGraphics.drawImage(imageMap.get(ImageType.Coin),coinstartx,coinstarty + (coindis*(option-1)),coinSize,coinSize,null);
 		backBufferGraphics.drawString("X "+costs[walletLevel[option-1]-1],cointextstartx,cointextstarty + (cointextdis*(option-1)));
 
 		backBufferGraphics.setColor(Color.WHITE);
