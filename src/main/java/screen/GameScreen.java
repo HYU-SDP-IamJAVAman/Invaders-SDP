@@ -126,6 +126,8 @@ public class GameScreen extends Screen implements Callable<GameState> {
 	private Set<ItemBox> itemBoxes;
 	/** Barriers appear in game screen. */
 	private Set<Barrier> barriers;
+	/** Barriers appear in game screen. */
+	private Set<AllyShip> allyShips;
 	/** Sound balance for each player*/
 	private float balance = 0.0f;
 
@@ -241,10 +243,12 @@ public class GameScreen extends Screen implements Callable<GameState> {
 
 		enemyShipFormation = new EnemyShipFormation(this.gameSettings, this.gameState);
 		enemyShipFormation.attach(this);
+
         // Appears each 10-30 seconds.
         this.ship = ShipFactory.create(this.shipType, this.width / 2, this.height - 30);
 		logger.info("Player ship created " + this.shipType + " at " + this.ship.getPositionX() + ", " + this.ship.getPositionY());
         ship.applyItem(wallet);
+
 		//Create random Spider Web.
 		int web_count = 1 + level / 3;
 		web = new ArrayList<>();
@@ -253,6 +257,7 @@ public class GameScreen extends Screen implements Callable<GameState> {
 			this.web.add(new Web((int) Math.max(0, randomValue * width - 12 * 2), this.height - 30));
 			this.logger.info("Spider web creation location : " + web.get(i).getPositionX());
 		}
+
 		//Create random Block.
 		int blockCount = level / 2;
 		int playerTopY_contain_barrier = this.height - 40 - 150;
@@ -288,8 +293,11 @@ public class GameScreen extends Screen implements Callable<GameState> {
 		this.screenFinishedCooldown = Core.getCooldown(SCREEN_CHANGE_INTERVAL);
 		this.bullets = new HashSet<>();
 		this.barriers = new HashSet<>();
+		this.allyShips = new HashSet<>();
         this.itemBoxes = new HashSet<>();
-		this.itemManager = new ItemManager(this.ship, this.enemyShipFormation, this.barriers, this.width, this.height, this.balance);
+		this.itemManager = new ItemManager(this.ship, this.enemyShipFormation,
+				this.barriers, this.allyShips,
+				this.height, this.width, this.balance);
 
 		// Special input delay / countdown.
 		this.gameStartTime = System.currentTimeMillis();
@@ -487,6 +495,17 @@ public class GameScreen extends Screen implements Callable<GameState> {
 			this.screenFinishedCooldown.reset();
 		}
 
+		// AllyShips appear when 'isAllyShipActive' is true.
+		if (itemManager.isAllyShipActive()) {
+			for (AllyShip allyShip : this.allyShips) {
+				allyShip.shoot(this.bullets);
+			}
+		}
+		// AllyShip will be removed when its cooldown ends.
+		else if (allyShips != null) {
+			allyShips.removeAll(this.allyShips);
+		}
+
 		if (this.levelFinished && this.screenFinishedCooldown.checkFinished()) {
 			//Reset alert message when level is finished
 			this.alertMessage = "";
@@ -528,6 +547,9 @@ public class GameScreen extends Screen implements Callable<GameState> {
 
 		for (Barrier barrier : this.barriers)
 			drawManager.drawEntity(barrier, barrier.getPositionX(), barrier.getPositionY());
+
+		for (AllyShip allyShip : this.allyShips)
+			drawManager.drawEntity(allyShip, allyShip.getPositionX(), allyShip.getPositionY());
 
 		for (Bullet bullet : this.bullets)
 			drawManager.drawEntity(bullet, bullet.getPositionX(),
@@ -676,6 +698,9 @@ public class GameScreen extends Screen implements Callable<GameState> {
 
 		for (Barrier barrier : this.barriers)
 			drawManager.drawEntity(barrier, barrier.getPositionX(), barrier.getPositionY(), playerNumber);
+
+		for (AllyShip allyShip : this.allyShips)
+			drawManager.drawEntity(allyShip, allyShip.getPositionX(), allyShip.getPositionY(), playerNumber);
 
 		for (Bullet bullet : this.bullets)
 			drawManager.drawEntity(bullet, bullet.getPositionX(),

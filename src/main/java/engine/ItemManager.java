@@ -28,11 +28,13 @@ public class ItemManager {
     /** Height of game screen. */
     private int HEIGHT;
     /** Item drop probability, (1 ~ 100). */
-    private static final int ITEM_DROP_PROBABILITY = 30;
+    private static final int ITEM_DROP_PROBABILITY = 100;
     /** Cooldown of Ghost */
     private static final int GHOST_COOLDOWN = 3000;
     /** Cooldown of Time-stop */
     private static final int TIMESTOP_COOLDOWN = 4000;
+    /** Cooldown of AllyShip */
+    private static final int ALLYSHIP_COOLDOWN = 10000;
     /** Max Speed */
     private final float MAX_SPEED = 3.0f;
     /** Random generator. */
@@ -43,6 +45,8 @@ public class ItemManager {
     private final EnemyShipFormation enemyShipFormation;
     /** Set of Barriers in game screen. */
     private final Set<Barrier> barriers;
+    /** Set of Barriers in game screen. */
+    private final Set<AllyShip> allyShips;
     /** Application logger. */
     private final Logger logger;
     /** Singleton instance of SoundManager */
@@ -51,6 +55,8 @@ public class ItemManager {
     private Cooldown ghost_cooldown = Core.getCooldown(0);
     /** Cooldown variable for Time-stop */
     private Cooldown timeStop_cooldown = Core.getCooldown(0);
+    /** Cooldown variable for AllyShip */
+    private Cooldown allyShip_cooldown = Core.getCooldown(0);
 
     /** Check if the number of shot is max, (maximum 3). */
     private boolean isMaxShotNum;
@@ -67,6 +73,7 @@ public class ItemManager {
         Ghost,
         TimeStop,
         SpeedUp,
+        AllyShip,
         MultiShot
     }
 
@@ -79,8 +86,11 @@ public class ItemManager {
      * @param balance 1p -1.0, 2p 1.0, both 0.0
      *
      */
-    public ItemManager(Ship ship, EnemyShipFormation enemyShipFormation, Set<Barrier> barriers, int width, int height, float balance) {
+    public ItemManager(Ship ship, EnemyShipFormation enemyShipFormation,
+                       Set<Barrier> barriers, Set<AllyShip> allyShips,
+                       int width, int height, float balance) {
         this.shotNum = 1;
+        this.allyShips = allyShips;
         this.rand = new Random();
         this.ship = ship;
         this.enemyShipFormation = enemyShipFormation;
@@ -109,9 +119,9 @@ public class ItemManager {
         ItemType[] itemTypes = ItemType.values();
 
         if (isMaxShotNum)
-            return itemTypes[rand.nextInt(6)];
+            return itemTypes[rand.nextInt(7)];
 
-        return itemTypes[rand.nextInt(7)];
+        return itemTypes[rand.nextInt(8)];
     }
 
     /**
@@ -131,6 +141,7 @@ public class ItemManager {
             case Ghost -> operateGhost();
             case TimeStop -> operateTimeStop();
             case SpeedUp -> operateSpeedUp();
+            case AllyShip -> operateAllyShip();
             case MultiShot -> operateMultiShot();
 
         };
@@ -330,6 +341,22 @@ public class ItemManager {
         return null;
     }
 
+    private Entry<Integer, Integer> operateAllyShip() {
+        if (!isAllyShipActive()) {
+            int allyShipY = HEIGHT - 30;
+            int middle = WIDTH / 2 - 39;
+            int range = 175;
+
+            this.allyShips.add(new AllyShip(middle - range, allyShipY));
+            this.allyShips.add(new AllyShip(middle + range, allyShipY));
+
+            this.allyShip_cooldown = Core.getCooldown(ALLYSHIP_COOLDOWN);
+            this.allyShip_cooldown.reset();
+        }
+
+        return null;
+    }
+
     /**
      * Checks if Ghost is active.
      *
@@ -347,6 +374,13 @@ public class ItemManager {
     public boolean isTimeStopActive() {
         return !this.timeStop_cooldown.checkFinished();
     }
+
+    /**
+     * Checks if AllyShip is active.
+     *
+     * @return True when AllyShip is active.
+     */
+    public boolean isAllyShipActive() { return !this.allyShip_cooldown.checkFinished(); }
 
     /**
      * Returns the number of bullets that player's ship shoot.

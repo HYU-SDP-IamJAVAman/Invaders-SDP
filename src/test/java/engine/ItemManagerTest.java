@@ -21,7 +21,7 @@ class ItemManagerTest {
     void setUp() throws NoSuchMethodException {
         ShipMultipliers testMultipliers = new ShipMultipliers(2.0f, 1.0f, 750);
         testShip = new Ship(0, 0, "Test Ship", testMultipliers, null);
-        testItemManager = new ItemManager(testShip, null, null, 800, 600, 0.0f);
+        testItemManager = new ItemManager(testShip, null, null, null, 800, 600, 0.0f);
 
         operateSpeedUp = ItemManager.class.getDeclaredMethod("operateSpeedUp");
         operateSpeedUp.setAccessible(true);
