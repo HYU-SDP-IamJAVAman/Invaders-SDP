@@ -71,6 +71,7 @@ public class GameSettingScreen extends Screen {
 		this.gameMode = 0; 	// 0: Normal, 1: Time Attack, 2: Survival
 
 		// row 3: start
+
 		this.selectedRow = 0;
 
 		this.selectionCooldown = Core.getCooldown(SELECTION_TIME);
@@ -146,17 +147,19 @@ public class GameSettingScreen extends Screen {
                 }
             }
         } else if (this.selectedRow == 2) { // Game mode
-            int previouseGameMode = this.gameMode;
-			if(inputManager.isKeyDown(KeyEvent.VK_LEFT) && this.gameMode > 0) {
-				this.gameMode--;
-			} else if(inputManager.isKeyDown(KeyEvent.VK_RIGHT) && this.gameMode < 2) {
-				this.gameMode++;
-			}
-			if (previouseGameMode != this.gameMode) {
-				logger.info("Game mode changed to " + this.gameMode);
-				this.selectionCooldown.reset();
-				soundManager.playSound(Sound.MENU_MOVE);
-			}
+            if (inputManager.isKeyDown(KeyEvent.VK_LEFT)) {
+                if (this.gameMode != 0) {
+                    this.gameMode--;
+                    this.selectionCooldown.reset();
+                    soundManager.playSound(Sound.MENU_MOVE);
+                }
+            } else if (inputManager.isKeyDown(KeyEvent.VK_RIGHT)) {
+                if (this.gameMode != 2) {
+                    this.gameMode++;
+                    this.selectionCooldown.reset();
+                    soundManager.playSound(Sound.MENU_MOVE);
+                }
+            }
         } else if(this.selectedRow == 3) { // Start
 			if (inputManager.isKeyDown(KeyEvent.VK_SPACE)) {
                 this.returnCode = isMultiplayer ? 8 : 2;
