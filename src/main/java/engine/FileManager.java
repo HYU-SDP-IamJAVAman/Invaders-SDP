@@ -2,6 +2,7 @@ package engine;
 
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,8 +21,11 @@ import java.util.logging.Logger;
 import java.util.Properties;
 
 import engine.DrawManager.SpriteType;
+import engine.DrawManager.ImageType;
 import entity.Wallet;
 import entity.Achievement;
+
+import javax.imageio.ImageIO;
 
 /**
  * Manages files used in the application.
@@ -98,6 +102,22 @@ public final class FileManager {
         }
 	}
 
+	public Map<ImageType, BufferedImage> loadImage(Map<ImageType, String> imageMap) throws IOException {
+		Map<ImageType, BufferedImage> resultMap = new HashMap<>();
+
+		for (Map.Entry<ImageType, String> image : imageMap.entrySet()) {
+			String filePath = image.getValue();
+			try (InputStream inputStream = DrawManager.class.getClassLoader().getResourceAsStream(filePath)) {
+				if (inputStream == null)
+					throw new IOException("Image file not found: " + filePath);
+
+				resultMap.put(image.getKey(), ImageIO.read(inputStream));
+			}
+		}
+
+		return resultMap;
+	}
+
 	/**
 	 * Loads a font of a given size.
 	 *
@@ -109,17 +129,14 @@ public final class FileManager {
 	 * @throws FontFormatException
 	 *             In case of incorrect font format.
 	 */
-	public Font loadFont(final float size) throws IOException,
-			FontFormatException {
+	public Font loadFont(final float size) throws IOException, FontFormatException {
 		InputStream inputStream = null;
 		Font font;
 
 		try {
 			// Font loading.
-			inputStream = FileManager.class.getClassLoader()
-					.getResourceAsStream("space_invaders.ttf");
-			font = Font.createFont(Font.TRUETYPE_FONT, inputStream).deriveFont(
-					size);
+			inputStream = FileManager.class.getClassLoader().getResourceAsStream("space_invaders.ttf");
+			font = Font.createFont(Font.TRUETYPE_FONT, inputStream).deriveFont(size);
 		} finally {
 			if (inputStream != null)
 				inputStream.close();
