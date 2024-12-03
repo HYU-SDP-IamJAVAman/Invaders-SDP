@@ -1791,9 +1791,12 @@ public final class DrawManager {
 			y = screenHeight / 100 * 35;
 			height = screen.getHeight() / 100 * 28;
 		} else if (selectedRow == 1) {
-			y = screenHeight / 100 * 63;
-			height = screen.getHeight() / 100 * 18;
+			y = screenHeight / 100 * 65;
+			height = screen.getHeight() / 100 * 15;
 		} else if (selectedRow == 2) {
+			y = screenHeight / 100 * 80;
+			height = screen.getHeight() / 100 * 13;
+		}else if(selectedRow == 3) {
 			y = screenHeight / 100 * 92;
 			height = screen.getHeight() / 100 * 10;
 		}
@@ -1822,7 +1825,7 @@ public final class DrawManager {
 	 *
 	 */
 	public void drawGameSettingElements(final Screen screen, final int selectedRow,
-		final boolean isMultiPlayer, final String name1, final String name2, final int difficultyLevel) {
+		final boolean isMultiPlayer, final String name1, final String name2, final int difficultyLevel, final int gameMode) {
 		String spaceString = " ";
 		String player1String = "1 Player";
 		String player2String = "2 Player";
@@ -1830,6 +1833,10 @@ public final class DrawManager {
 		String levelNormalString = "Normal";
 		String levelHardString = "Hard";
 		String startString = "Start";
+
+		String modeNormalString = "Normal";
+		String modeTimeAttackString = "Time Attack";
+		String modeSurvivalString = "Survival";
 
 		if (!isMultiPlayer) backBufferGraphics.setColor(Color.GREEN);
 		else backBufferGraphics.setColor(Color.WHITE);
@@ -1857,7 +1864,22 @@ public final class DrawManager {
 
 		if (selectedRow == 2) backBufferGraphics.setColor(Color.GREEN);
 		else backBufferGraphics.setColor(Color.WHITE);
+
+		// draw game mode
+		if(gameMode == 0) backBufferGraphics.setColor(Color.GREEN);
+		else backBufferGraphics.setColor(Color.WHITE);
+		drawCenteredRegularString(screen, modeNormalString + spaceString.repeat(60), screen.getHeight() / 100 * 87);
+		if(gameMode == 1) backBufferGraphics.setColor(Color.GREEN);
+		else backBufferGraphics.setColor(Color.WHITE);
+		drawCenteredRegularString(screen, modeTimeAttackString, screen.getHeight() / 100 * 87);
+		if(gameMode == 2) backBufferGraphics.setColor(Color.GREEN);
+		else backBufferGraphics.setColor(Color.WHITE);
+		drawCenteredRegularString(screen, spaceString.repeat(60) + modeSurvivalString, screen.getHeight() / 100 * 87);
+
+		if(selectedRow == 3) backBufferGraphics.setColor(Color.GREEN);
+		else backBufferGraphics.setColor(Color.WHITE);
 		drawCenteredRegularString(screen, startString, screen.getHeight() / 100 * 98);
+
 	}
 
 	/**
