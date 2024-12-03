@@ -49,7 +49,7 @@ public final class Core {
 	private static long startTime, endTime;
 
 	private static int DifficultySetting;// <- setting EASY(0), NORMAL(1), HARD(2);
-
+	private static int GameModeSetting;// <- setting Normal(0), Time Attack(1), Survival(2);
 
 	/**
 	 * Test implementation.
@@ -88,7 +88,11 @@ public final class Core {
 
 		int returnCode = 1;
 		do {
-			MAX_LIVES = wallet.getLives_lv()+2;
+			if(GameModeSetting == 2) { // Survival mode
+				MAX_LIVES = 1;
+			} else {
+				MAX_LIVES = wallet.getLives_lv()+2;
+			}
 			gameState = new GameState(1, 0, BASE_SHIP, MAX_LIVES, 0, 0, 0, "", 0, 0, 0 ,0, 0);
 			achievementManager = new AchievementManager();
 
@@ -310,5 +314,13 @@ public final class Core {
 
 	public static int getLevelSetting(){
 		return DifficultySetting;
+	}
+
+	public static void setGameModeSetting(final int mode) {
+		GameModeSetting = mode;
+	}
+
+	public static int getGameModeSetting() {
+		return GameModeSetting;
 	}
 }

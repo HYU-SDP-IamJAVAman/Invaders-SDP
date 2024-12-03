@@ -2,6 +2,9 @@ package engine;
 
 import entity.Ship;
 
+import engine.Core;
+import java.util.logging.Logger;
+
 /**
  * Implements an object that stores the state of the game between levels.
  * 
@@ -35,6 +38,8 @@ public class GameState {
 	private int prevScore;
 
 	private int hitBullets;
+
+	private Logger logger = Core.getLogger();
 
 	/**
 	 * Constructor.
@@ -77,6 +82,7 @@ public class GameState {
 		this.prevTime = prevTime;
 		this.prevScore = prevScore;
 		this.hitBullets = hitBullets;
+		logger.info("livesRemaining: " + livesRemaining);
 	}
 
 	public GameState(GameState gameState) {
@@ -92,6 +98,7 @@ public class GameState {
 		this.prevTime = gameState.prevTime;
 		this.prevScore = gameState.prevScore;
 		this.hitBullets = gameState.hitBullets;
+		logger.info("livesRemaining: " + livesRemaining);
 	}
 
 
@@ -108,6 +115,7 @@ public class GameState {
 		this.prevTime = gameState.prevTime;
 		this.prevScore = gameState.prevScore;
 		this.hitBullets = gameState.hitBullets;
+		logger.info("livesRemaining: " + livesRemaining);
 	}
 
 
