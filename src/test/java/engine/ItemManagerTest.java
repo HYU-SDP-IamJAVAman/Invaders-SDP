@@ -1,21 +1,27 @@
 package engine;
 
+import entity.AllyShip;
 import entity.Ship;
 import entity.ShipMultipliers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ItemManagerTest {
 
     private Ship testShip;
+    private Set<AllyShip> testAllyShips;
     private ItemManager testItemManager;
     private Method operateSpeedUp;
+    private Method operateAllyShip;
 
     @BeforeEach
     void setUp() throws NoSuchMethodException {
@@ -25,6 +31,9 @@ class ItemManagerTest {
 
         operateSpeedUp = ItemManager.class.getDeclaredMethod("operateSpeedUp");
         operateSpeedUp.setAccessible(true);
+
+        operateAllyShip = ItemManager.class.getDeclaredMethod("operateAllyShip");
+        operateAllyShip.setAccessible(true);
     }
 
     @Test
@@ -45,5 +54,24 @@ class ItemManagerTest {
 
         //Maximum speed test
         assertEquals(2.999999f, testShip.getMultipliers().speed(), 0.000001f);
+    }
+
+    @Test
+    @DisplayName("AllyShip Test")
+    public void testOperateAllyShip() throws InvocationTargetException, IllegalAccessException, NoSuchFieldException {
+        Set<AllyShip> testAllyShips = new HashSet<>();
+
+        Field allyShipsField = ItemManager.class.getDeclaredField("allyShips");
+        allyShipsField.setAccessible(true);
+        allyShipsField.set(testItemManager, testAllyShips);
+
+        // 초기 allyShips 상태 확인
+        assertEquals(0, testAllyShips.size(), "AllyShips should initially be empty");
+
+        // AllyShip 아이템 사용
+        operateAllyShip.invoke(testItemManager);
+
+        // AllyShip 생성 확인
+        assertEquals(2, testAllyShips.size(), "Two AllyShips should be created after invoking operateAllyShip");
     }
 }
