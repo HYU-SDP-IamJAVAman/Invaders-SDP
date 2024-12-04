@@ -7,6 +7,10 @@ package engine;
  * 
  */
 public class GameSettings {
+	private static final int MAX_WIDTH = 14;
+	private static final int MAX_HEIGHT = 10;
+	private static final int MIN_SPEED = -100;
+	private static final int MIN_FREQUENCY = 100;
 	private int difficulty;
 	/** Width of the level's enemy formation. */
 	private int formationWidth;
@@ -15,12 +19,12 @@ public class GameSettings {
 	/** Speed of the enemies, function of the remaining number. */
 	private int baseSpeed;
 	/** Frequency of enemy shootings, +/- 30%. */
-	private int shootingFrecuency;
+	private int shootingFrequency;
 
 	private int gameMode;
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param formationWidth
 	 *            Width of the level's enemy formation.
 	 * @param formationHeight
@@ -38,7 +42,7 @@ public class GameSettings {
 		this.formationWidth = formationWidth;
 		this.formationHeight = formationHeight;
 		this.baseSpeed = baseSpeed;
-		this.shootingFrecuency = shootingFrequency;
+		this.shootingFrequency = shootingFrequency;
 		this.gameMode = gameMode;
 	}
 
@@ -46,7 +50,7 @@ public class GameSettings {
 		this.formationWidth = gameSettings.formationWidth;
 		this.formationHeight = gameSettings.formationHeight;
 		this.baseSpeed = gameSettings.baseSpeed;
-		this.shootingFrecuency = gameSettings.shootingFrecuency;
+		this.shootingFrequency = gameSettings.shootingFrequency;
 		this.gameMode = gameSettings.gameMode;
 	}
 
@@ -75,7 +79,7 @@ public class GameSettings {
 	 * @return the shootingFrecuency
 	 */
 	public final int getShootingFrecuency() {
-		return shootingFrecuency;
+		return shootingFrequency;
 	}
 
 	/**
@@ -168,6 +172,42 @@ public class GameSettings {
 				yield null;
 			}
 		};
+		int widthIncrement = (difficulty % 2 == 0 && level >= 5) ? 2 : 1;
+		int speedDecrement;
+		if (difficulty == 0) {
+			speedDecrement = 10;
+		} else if (difficulty == 1) {
+			speedDecrement = (level >= 5) ? 15 : 10;
+		} else {
+			speedDecrement = (level >= 5) ? 18 : 12;
+		}
+		int frequencyDecrement = switch (difficulty) {
+			case 0 -> 100;
+			case 1 -> (level >= 5) ? 300 : 200;
+			case 2 -> (level >= 5) ? 400 : 300;
+			default -> 0;
+		};
+
+		boolean shouldAdjust = (level % 3 == 0 && level < 5) || level >= 5;
+		if(shouldAdjust)  {
+			adjustFormation(formationWidth, formationHeight, widthIncrement);
+		}
+		adjustSpeedAndFrequency(baseSpeed, shootingFrecuency, speedDecrement, frequencyDecrement);
+
+		return new GameSettings(this.formationWidth, this.formationHeight, this.baseSpeed, this.shootingFrequency);
+	}
+
+	private void adjustFormation(int formationWidth, int formationHeight, int increment) {
+		if (formationWidth == formationHeight) {
+			this.formationWidth = Math.min(formationWidth + increment, MAX_WIDTH);
+		} else {
+			this.formationHeight = Math.min(formationHeight + increment, MAX_HEIGHT);
+		}
+	}
+
+	private void adjustSpeedAndFrequency(int baseSpeed, int shootingFrequency, int speedDecrement, int frequencyDecrement) {
+		this.baseSpeed = Math.max(baseSpeed - speedDecrement, MIN_SPEED);
+		this.shootingFrequency = Math.max(shootingFrequency - frequencyDecrement, MIN_FREQUENCY);
 	}
 
 	/**
