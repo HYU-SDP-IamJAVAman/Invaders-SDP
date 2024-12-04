@@ -24,7 +24,7 @@ public class GameSettings {
 	private int gameMode;
 	/**
 	 * Constructor.
-	 *
+	 * 
 	 * @param formationWidth
 	 *            Width of the level's enemy formation.
 	 * @param formationHeight
