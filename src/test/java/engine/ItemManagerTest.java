@@ -65,13 +65,13 @@ class ItemManagerTest {
         allyShipsField.setAccessible(true);
         allyShipsField.set(testItemManager, testAllyShips);
 
-        // 초기 allyShips 상태 확인
+        // Check initial allyShips status
         assertEquals(0, testAllyShips.size(), "AllyShips should initially be empty");
 
-        // AllyShip 아이템 사용
+        // Use AllyShip item
         operateAllyShip.invoke(testItemManager);
 
-        // AllyShip 생성 확인
+        // Verify the creation of the AllyShip
         assertEquals(2, testAllyShips.size(), "Two AllyShips should be created after invoking operateAllyShip");
     }
 }

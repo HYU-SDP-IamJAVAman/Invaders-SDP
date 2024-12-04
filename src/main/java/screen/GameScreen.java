@@ -295,9 +295,7 @@ public class GameScreen extends Screen implements Callable<GameState> {
 		this.barriers = new HashSet<>();
 		this.allyShips = new HashSet<>();
         this.itemBoxes = new HashSet<>();
-		this.itemManager = new ItemManager(this.ship, this.enemyShipFormation,
-				this.barriers, this.allyShips,
-				this.height, this.width, this.balance);
+		this.itemManager = new ItemManager(this.ship, this.enemyShipFormation, this.barriers, this.allyShips, this.width, this.height, this.balance);
 
 		// Special input delay / countdown.
 		this.gameStartTime = System.currentTimeMillis();
@@ -482,6 +480,17 @@ public class GameScreen extends Screen implements Callable<GameState> {
 			}
 		}
 
+		// AllyShips appear when 'isAllyShipActive' is true.
+		if (itemManager.isAllyShipActive()) {
+			for (AllyShip allyShip : this.allyShips) {
+				allyShip.shoot(this.bullets);
+			}
+		}
+		// AllyShip will be removed when its cooldown ends.
+		else if (allyShips != null) {
+			allyShips.clear();
+		}
+
 		manageCollisions();
 		cleanBullets();
 		if (playerNumber >= 0)
@@ -497,17 +506,6 @@ public class GameScreen extends Screen implements Callable<GameState> {
 			if (this.lives == 0)
 				soundManager.playSound(Sound.GAME_END);
 			this.screenFinishedCooldown.reset();
-		}
-
-		// AllyShips appear when 'isAllyShipActive' is true.
-		if (itemManager.isAllyShipActive()) {
-			for (AllyShip allyShip : this.allyShips) {
-				allyShip.shoot(this.bullets);
-			}
-		}
-		// AllyShip will be removed when its cooldown ends.
-		else if (allyShips != null) {
-			allyShips.removeAll(this.allyShips);
 		}
 
 		if (this.levelFinished && this.screenFinishedCooldown.checkFinished()) {
