@@ -28,7 +28,7 @@ public class ItemManager {
     /** Height of game screen. */
     private int HEIGHT;
     /** Item drop probability, (1 ~ 100). */
-    private static final int ITEM_DROP_PROBABILITY = 100;
+    private static final int ITEM_DROP_PROBABILITY = 30;
     /** Cooldown of Ghost */
     private static final int GHOST_COOLDOWN = 3000;
     /** Cooldown of Time-stop */
@@ -349,10 +349,10 @@ public class ItemManager {
 
             this.allyShips.add(new AllyShip(middle - range, allyShipY));
             this.allyShips.add(new AllyShip(middle + range, allyShipY));
-
-            this.allyShip_cooldown = Core.getCooldown(ALLYSHIP_COOLDOWN);
-            this.allyShip_cooldown.reset();
         }
+
+        this.allyShip_cooldown = Core.getCooldown(ALLYSHIP_COOLDOWN);
+        this.allyShip_cooldown.reset();
 
         return null;
     }
@@ -380,7 +380,9 @@ public class ItemManager {
      *
      * @return True when AllyShip is active.
      */
-    public boolean isAllyShipActive() { return !this.allyShip_cooldown.checkFinished(); }
+    public boolean isAllyShipActive() {
+        return !this.allyShip_cooldown.checkFinished();
+    }
 
     /**
      * Returns the number of bullets that player's ship shoot.
