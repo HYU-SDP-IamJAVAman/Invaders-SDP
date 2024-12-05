@@ -116,7 +116,7 @@ public final class Core {
 					startTime = System.currentTimeMillis();
 					boolean bonusLife = gameState.getLevel()
 							% EXTRA_LIFE_FRECUENCY == 0
-							&& gameState.getLivesRemaining() < MAX_LIVES;
+							&& gameState.getLivesRemaining() < MAX_LIVES && GameModeSetting != 2;
 					LOGGER.info("difficulty is " + DifficultySetting);
 					//add variation
 					gameSetting = gameSetting.LevelSettings(gameSetting.getFormationWidth(),
@@ -140,6 +140,8 @@ public final class Core {
 					endTime = System.currentTimeMillis();
 					achievementManager.updatePlaying(gameState.getMaxCombo(),(int) (endTime - startTime) / 1000, MAX_LIVES, gameState.getLivesRemaining(), gameState.getLevel()-1);
 				} while (gameState.getLivesRemaining() > 0);
+
+				// After the game ends
 				achievementManager.updatePlayed(gameState.getAccuracy(), gameState.getScore());
                 achievementManager.updateAllAchievements();
 				LOGGER.info("Starting " + WIDTH + "x" + HEIGHT
