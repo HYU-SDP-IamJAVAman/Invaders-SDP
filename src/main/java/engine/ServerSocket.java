@@ -3,6 +3,8 @@ package engine;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import entity.Achievement;
+import entity.Wallet;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -18,14 +20,20 @@ public class ServerSocket implements HttpHandler {
     HttpServer server;
     /** Player's name. */
     String nickname = "";
-    String ip = "172.17.64.57";
-
+    String ip = "172.17.74.133";
+    AchievementManager achievementManager;
+    Achievement achievement;
+    Wallet wallet;
     /** ServerSocket Constructor  */
     public ServerSocket() throws IOException {
         server = HttpServer.create(new InetSocketAddress(7777), 0); // 7070 포트에 배정
         server.createContext("/userUpdate", this); // 이 URL로 컨트롤러 매핑
         server.setExecutor(null);
         server.start();
+
+        achievementManager = Core.getAchievementManager();
+        achievement = achievementManager.getAchievement();
+        wallet = Core.getWallet();
     }
 
     /** Mapping this handler method to POST request from server */
@@ -123,20 +131,51 @@ public class ServerSocket implements HttpHandler {
             }
         }
 
-        Pattern pattern = Pattern.compile("\"nickname\":\"(.*?)\"");
+        Pattern pattern = Pattern.compile("\"nickname\":\"(.*?)\", \"currentCoin\":\"(.*?)\", \"totalPlay\":\"(.*?)\", \"totalScore\":\"(.*?)\", \"highMaxCombo\":\"(.*?)\", \"perfectStage\":\"(.*?)\", \"flawlessFailure\":\"(.*?)\"");
         Matcher matcher = pattern.matcher(responseBody);
 
+//        ObjectMapper mapper = new ObjectMapper();
+//        ResponseData result = mapper.readValue(responseBody, ResponseData.class);
+//        nickname = result.getNickname();
+//        coin = Integer.parseInt(result.getCoin());
         if (matcher.find()) {
             nickname = matcher.group(1);
+            wallet.setCoin(Integer.parseInt(matcher.group(2)));
+            achievement.setTotalPlayTime(Integer.parseInt(matcher.group(3)));
+            achievement.setTotalScore(Integer.parseInt(matcher.group(4)));
+            achievement.setHighMaxcombo(Integer.parseInt(matcher.group(5)));
+            achievement.setCurrentPerfectStage(Integer.parseInt(matcher.group(6)));
+            achievement.setFlawlessFailure(Boolean.parseBoolean(matcher.group(7)));
         }
+        wallet.writeWallet();
+        achievementManager.updateAllAchievements();
         System.out.println(nickname);
         return responseCode;
     }
 
+    class ResponseData {
+        private String nickname;
+        private String coin;
+
+        public String getNickname() {
+            return nickname;
+        }
+        public void setNickname(String nickname) {
+            this.nickname = nickname;
+        }
+
+        public String getCoin() {
+            return coin;
+        }
+
+        public void setCoin(String coin) {
+            this.coin = coin;
+        }
+    }
     /** Send User score and currentCoin value */
-    public int sendUserState(String nickname,int score, int currentCoin) throws IOException {
+    public int sendUserState(String nickname,int score, int currentCoin, int totalPlayTime, int totalScore, int maxCombo, int perfectStage, boolean flawlessFailure) throws IOException {
         String targetUrl = String.format("http://%s:8080/userstate", ip);
-        String userStateData = String.format("%s,%d,%d", nickname, score, currentCoin);
+        String userStateData = String.format("%s,%d,%d,%d,%d,%d,%d,%b", nickname, score, currentCoin, totalPlayTime, totalScore, maxCombo, perfectStage, flawlessFailure);
 
         return sendPostRequest(targetUrl,userStateData);
     }

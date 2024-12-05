@@ -7,6 +7,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import entity.Achievement;
 import entity.Ship;
 import entity.Wallet;
 import screen.*;
@@ -50,7 +51,11 @@ public final class Core {
 
 	private static int DifficultySetting;// <- setting EASY(0), NORMAL(1), HARD(2);
 	/** Initialize HTTP ServerSocket */
-	public static ServerSocket serverSocket;
+	private static ServerSocket serverSocket;
+
+	private static AchievementManager achievementManager;
+
+	private static Wallet wallet;
 
 
 	/**
@@ -87,8 +92,7 @@ public final class Core {
 
 		GameState gameState;
 
-		AchievementManager achievementManager;
-		Wallet wallet = Wallet.getWallet();
+		wallet = Wallet.getWallet();
 
 		int returnCode = 9;
 		do {
@@ -149,7 +153,8 @@ public final class Core {
 						+ gameState.getShipsDestroyed() + " ships destroyed.");
 				currentScreen = new ScoreScreen(GameSettingScreen.getName(0), width, height, FPS, gameState, wallet, achievementManager, false);
 
-				serverSocket.sendUserState(serverSocket.nickname, gameState.getScore(), wallet.getCoin());
+				Achievement achievement = achievementManager.getAchievement();
+				serverSocket.sendUserState(serverSocket.nickname, gameState.getScore(), wallet.getCoin(), achievement.getTotalPlayTime(), achievement.getTotalScore(), achievement.getHighmaxCombo(), achievement.getPerfectStage(), achievement.getFlawlessFailure());
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing score screen.");
 				break;
@@ -345,5 +350,13 @@ public final class Core {
 				MAX_LIVES = 1;
 				break;
 		}
+	}
+
+	public static AchievementManager getAchievementManager() {
+		return achievementManager;
+	}
+
+	public static Wallet getWallet() {
+		return wallet;
 	}
 }
