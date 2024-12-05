@@ -17,6 +17,7 @@ public class GameSettings {
 	/** Frequency of enemy shootings, +/- 30%. */
 	private int shootingFrecuency;
 
+	private int gameMode;
 	/**
 	 * Constructor.
 	 * 
@@ -29,13 +30,16 @@ public class GameSettings {
 	 * @param shootingFrequency
 	 *            Frecuen
 	 *            cy of enemy shootings, +/- 30%.
+	 * @param gameMode
+	 * 		  Game mode
 	 */
 	public GameSettings(final int formationWidth, final int formationHeight,
-			final int baseSpeed, final int shootingFrequency) { // fix typo
+			final int baseSpeed, final int shootingFrequency, final int gameMode) { // fix typo
 		this.formationWidth = formationWidth;
 		this.formationHeight = formationHeight;
 		this.baseSpeed = baseSpeed;
 		this.shootingFrecuency = shootingFrequency;
+		this.gameMode = gameMode;
 	}
 
 	public GameSettings(GameSettings gameSettings) { // fix typo
@@ -43,6 +47,7 @@ public class GameSettings {
 		this.formationHeight = gameSettings.formationHeight;
 		this.baseSpeed = gameSettings.baseSpeed;
 		this.shootingFrecuency = gameSettings.shootingFrecuency;
+		this.gameMode = gameSettings.gameMode;
 	}
 
 	/**
@@ -109,7 +114,7 @@ public class GameSettings {
 					if(shootingFrecuency-100 > 100) shootingFrecuency -= 100;
 					else shootingFrecuency = 100;
 				}
-                yield new GameSettings(formationWidth, formationHeight, baseSpeed, shootingFrecuency);
+                yield new GameSettings(formationWidth, formationHeight, baseSpeed, shootingFrecuency, gameMode);
 			}
 			case 1 -> {
 				if(level%2 == 0 && level < 5){
@@ -133,7 +138,7 @@ public class GameSettings {
 					if(shootingFrecuency-300 > 300) shootingFrecuency -= 300; //Adjust firing interval
 					else shootingFrecuency = 100;
 				}
-                yield new GameSettings(formationWidth, formationHeight, baseSpeed, shootingFrecuency);
+                yield new GameSettings(formationWidth, formationHeight, baseSpeed, shootingFrecuency, gameMode);
 			}
 			case 2 -> {
 				if(level%2 == 0 && level < 5){
@@ -157,7 +162,7 @@ public class GameSettings {
 					if(shootingFrecuency-400 > 400) shootingFrecuency -= 400;
 					else shootingFrecuency = 100;
 				}
-                yield new GameSettings(formationWidth, formationHeight, baseSpeed, shootingFrecuency);
+                yield new GameSettings(formationWidth, formationHeight, baseSpeed, shootingFrecuency, gameMode);
 			}
 			default -> {
 				yield null;
@@ -170,6 +175,13 @@ public class GameSettings {
 	 */
 	public int getDifficulty() {
 		return difficulty;
+	}
+
+	/**
+	 * @return gameMode
+	 */
+	public int getGameMode() {
+		return gameMode;
 	}
 
 }

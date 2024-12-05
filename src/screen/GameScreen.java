@@ -368,6 +368,10 @@ public class GameScreen extends Screen implements Callable<GameState> {
 			if (this.prevTime != null)
 				this.elapsedTime += (int) (currentTime - this.prevTime);
 
+			if(gameSettings.getGameMode() == 1 && this.elapsedTime >= 100000) { // Time Attack Mode 100 seconds
+				this.lives = 0;
+			}
+
 			this.prevTime = (int) currentTime;
 
 			if(!itemManager.isGhostActive())
