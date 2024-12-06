@@ -46,7 +46,20 @@
                     <mainClass>engine.Core</mainClass>
                 </configuration>
             </plugin>
+
+            <!-- Test Plugin-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <printSummary>true</printSummary>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-    
+
 </project>
