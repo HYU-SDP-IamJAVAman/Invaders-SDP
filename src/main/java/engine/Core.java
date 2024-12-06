@@ -51,6 +51,7 @@ public final class Core {
 	private static int DifficultySetting;// <- setting EASY(0), NORMAL(1), HARD(2);
 	private static int GameModeSetting;// <- setting Normal(0), Time Attack(1), Survival(2);
 
+
 	/**
 	 * Test implementation.
 	 * 

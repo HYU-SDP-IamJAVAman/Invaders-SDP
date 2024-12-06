@@ -1818,7 +1818,9 @@ public final class DrawManager {
 	 *
 	 */
 	public void drawGameSettingElements(final Screen screen, final int selectedRow,
+
 		final boolean isMultiPlayer, final String name1, final String name2, final int difficultyLevel, final int gameMode) {
+
 		String spaceString = " ";
 		String player1String = "1 Player";
 		String player2String = "2 Player";

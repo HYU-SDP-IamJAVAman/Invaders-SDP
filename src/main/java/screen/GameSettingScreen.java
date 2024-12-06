@@ -34,14 +34,17 @@ public class GameSettingScreen extends Screen {
 	private int difficultyLevel;
 	/** Game mode. */
 	private int gameMode;
+
 	/** Selected row. */
 	private int selectedRow;
 	/** Time between changes in user selection. */
 	private final Cooldown selectionCooldown;
 
 	/** Total number of rows for selection. */
+
 	private static final int TOTAL_ROWS = 4;
 	// 0: Multiplayer, 1: Difficulty, 2: GameMode, 3: Start
+
 
 	/** Singleton instance of SoundManager */
 	private final SoundManager soundManager = SoundManager.getInstance();
@@ -176,6 +179,7 @@ public class GameSettingScreen extends Screen {
     }
 }
 
+
 	/**
 	 * Handles the input for player name.
 	 *
@@ -235,5 +239,6 @@ public class GameSettingScreen extends Screen {
 
 		Core.setLevelSetting(this.difficultyLevel);
 		Core.setGameModeSetting(this.gameMode);
+
 	}
 }

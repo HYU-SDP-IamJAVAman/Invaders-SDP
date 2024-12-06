@@ -34,6 +34,7 @@ public class GameSettings {
 	 * @param shootingFrequency
 	 *            Frecuen
 	 *            cy of enemy shootings, +/- 30%.
+
 	 * @param gameMode
 	 * 		  Game mode
 	 */
@@ -44,6 +45,7 @@ public class GameSettings {
 		this.baseSpeed = baseSpeed;
 		this.shootingFrequency = shootingFrequency;
 		this.gameMode = gameMode;
+
 	}
 
 	public GameSettings(GameSettings gameSettings) { // fix typo
@@ -52,6 +54,7 @@ public class GameSettings {
 		this.baseSpeed = gameSettings.baseSpeed;
 		this.shootingFrequency = gameSettings.shootingFrequency;
 		this.gameMode = gameSettings.gameMode;
+
 	}
 
 	/**
@@ -172,6 +175,9 @@ public class GameSettings {
 				yield null;
 			}
 		};
+	public GameSettings LevelSettings(int formationWidth, int formationHeight, int baseSpeed, int shootingFrecuency,
+									  int level, int difficulty) {
+		this.difficulty = difficulty;
 		int widthIncrement = (difficulty % 2 == 0 && level >= 5) ? 2 : 1;
 		int speedDecrement;
 		if (difficulty == 0) {
@@ -217,7 +223,6 @@ public class GameSettings {
 	public int getDifficulty() {
 		return difficulty;
 	}
-
 	/**
 	 * @return gameMode
 	 */
