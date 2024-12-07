@@ -345,10 +345,10 @@ public class ItemManager {
         if (!isAllyShipActive()) {
             int allyShipY = HEIGHT - 30;
             int middle = WIDTH / 2 - 39;
-            int range = 175;
+            int range = 200;
 
-            this.allyShips.add(new AllyShip(middle - range, allyShipY));
-            this.allyShips.add(new AllyShip(middle + range, allyShipY));
+            this.allyShips.add(new AllyShip(middle - range + 26, allyShipY));
+            this.allyShips.add(new AllyShip(middle + range + 26, allyShipY));
         }
 
         this.allyShip_cooldown = Core.getCooldown(ALLYSHIP_COOLDOWN);
