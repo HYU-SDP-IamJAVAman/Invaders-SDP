@@ -1,0 +1,68 @@
+name: PR Metrics Analysis
+
+on:
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  checks: write
+  pull-requests: write
+
+env:
+  JAVA_VERSION: '21'
+  JAVA_DISTRIBUTION: 'temurin'
+  METRICS_JAR: 'tools/ck-0.7.0-jar-with-dependencies.jar'
+  COMPARATOR_JAR: 'tools/MetricComparator.jar'
+
+jobs:
+  metric-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set Up Java Environment
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+
+      - name: Run Metrics on PR Code
+        run: |
+          mkdir -p metrics
+          java -jar ${{ env.METRICS_JAR }} src/main/java true 0 false metrics/pr_metrics.csv
+
+      - name: Checkout Base Branch (master)
+        run: |
+          git fetch origin master
+          git checkout master
+
+      - name: Run Metrics on Base Branch Code
+        run: |
+          mkdir -p metrics
+          java -jar ${{ env.METRICS_JAR }} src/main/java true 0 false metrics/base_metrics.csv
+
+      - name: Compare Metrics
+        run: |
+          java -jar ${{ env.COMPARATOR_JAR }} metrics/base_metrics.csvclass.csv metrics/pr_metrics.csvclass.csv metrics_output.txt
+
+      - name: Publish Metrics Analysis Report
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const content = fs.readFileSync('metrics_output.txt', 'utf8');
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: `### Metrics Analysis Report\n\`\`\`\n${content}\n\`\`\``
+            });
+
+      - name: Upload Metrics Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: metrics-results
+          path: |
+            metrics/*.csv
+            metrics_output.txt
