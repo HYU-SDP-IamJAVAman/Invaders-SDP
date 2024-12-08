@@ -78,11 +78,25 @@ public final class Core {
 			LOGGER.addHandler(consoleHandler);
 			LOGGER.setLevel(Level.ALL);
 
+			achievementManager = new AchievementManager();
 			serverSocket = new ServerSocket();
 
 		} catch (Exception e) {
 			// TODO handle exception
 			e.printStackTrace();
+		}
+
+		while(true) {
+			String yesOrNo = serverSocket.askSignupOrLogin();
+			if (yesOrNo.equals("YES")){
+				if (serverSocket.requestLogin() == 200) {
+					break;
+				}
+			} else if (yesOrNo.equals("NO")) {
+				serverSocket.requestSignup();
+			} else {
+				System.out.println("You enter wrong command!");
+			}
 		}
 
 		frame = new Frame(WIDTH, HEIGHT);
@@ -94,11 +108,11 @@ public final class Core {
 
 		wallet = Wallet.getWallet();
 
-		int returnCode = 9;
+		int returnCode = 1;
 		do {
 			setLivesByDifficulty(DifficultySetting);
 			gameState = new GameState(1, 0, BASE_SHIP, MAX_LIVES, 0, 0, 0, "", 0, 0, 0 ,0, 0);
-			achievementManager = new AchievementManager();
+
 
 			GameSettings gameSetting = new GameSettings(4, 4, 60, 2500);
 
@@ -231,14 +245,7 @@ public final class Core {
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing score screen.");
 				break;
-				case 9:
-					while(true) {
-						if (serverSocket.requestSignup() == 200 && serverSocket.requestLogin() == 200){
-							returnCode = 1;
-							break;
-						}
 
-					}
 			default:
 				break;
 			}

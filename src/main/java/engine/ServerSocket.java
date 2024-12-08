@@ -20,7 +20,7 @@ public class ServerSocket implements HttpHandler {
     HttpServer server;
     /** Player's name. */
     String nickname = "";
-    String ip = "172.17.74.133";
+    String ip = "172.30.1.60";
     AchievementManager achievementManager;
     Achievement achievement;
     Wallet wallet;
@@ -33,7 +33,7 @@ public class ServerSocket implements HttpHandler {
 
         achievementManager = Core.getAchievementManager();
         achievement = achievementManager.getAchievement();
-        wallet = Core.getWallet();
+        wallet = new Wallet();
     }
 
     /** Mapping this handler method to POST request from server */
@@ -153,25 +153,6 @@ public class ServerSocket implements HttpHandler {
         return responseCode;
     }
 
-    class ResponseData {
-        private String nickname;
-        private String coin;
-
-        public String getNickname() {
-            return nickname;
-        }
-        public void setNickname(String nickname) {
-            this.nickname = nickname;
-        }
-
-        public String getCoin() {
-            return coin;
-        }
-
-        public void setCoin(String coin) {
-            this.coin = coin;
-        }
-    }
     /** Send User score and currentCoin value */
     public int sendUserState(String nickname,int score, int currentCoin, int totalPlayTime, int totalScore, int maxCombo, int perfectStage, boolean flawlessFailure) throws IOException {
         String targetUrl = String.format("http://%s:8080/userstate", ip);
@@ -197,5 +178,14 @@ public class ServerSocket implements HttpHandler {
         int responseCode = connection.getResponseCode();
         System.out.println("Response Code: " + responseCode);
         return responseCode;
+    }
+    public String askSignupOrLogin() throws IOException {
+        System.out.println("If you already have your account and want to login, please enter [YES]");
+        System.out.println("Or if you don't have any account, please enter [NO]");
+        Scanner scanner = new Scanner(System.in);
+
+        String yesOrNo = scanner.nextLine();
+
+        return yesOrNo;
     }
 }
