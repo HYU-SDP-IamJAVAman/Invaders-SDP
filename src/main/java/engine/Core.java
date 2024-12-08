@@ -44,12 +44,12 @@ public final class Core {
 	/** Logger handler for printing to console. */
 	private static ConsoleHandler consoleHandler;
 	/** Initialize singleton instance of SoundManager and return that */
-	private static SoundManager soundManager;
+	private static final SoundManager soundManager = SoundManager.getInstance();
 
 	private static long startTime, endTime;
 
 	private static int DifficultySetting;// <- setting EASY(0), NORMAL(1), HARD(2);
-
+	private static int GameModeSetting;// <- setting Normal(0), Time Attack(1), Survival(2);
 
 	/**
 	 * Test implementation.
@@ -71,8 +71,6 @@ public final class Core {
 			LOGGER.addHandler(consoleHandler);
 			LOGGER.setLevel(Level.ALL);
 
-			soundManager = SoundManager.getInstance();
-
 		} catch (Exception e) {
 			// TODO handle exception
 			e.printStackTrace();
@@ -90,11 +88,16 @@ public final class Core {
 
 		int returnCode = 1;
 		do {
-			setLivesByDifficulty(DifficultySetting);
+			if(GameModeSetting == 2) { // Survival mode
+				MAX_LIVES = 1;
+			} else {
+				MAX_LIVES = wallet.getLives_lv()+2;
+			}
+//			setLivesByDifficulty(DifficultySetting);
 			gameState = new GameState(1, 0, BASE_SHIP, MAX_LIVES, 0, 0, 0, "", 0, 0, 0 ,0, 0);
 			achievementManager = new AchievementManager();
 
-			GameSettings gameSetting = new GameSettings(4, 4, 60, 2500);
+			GameSettings gameSetting = new GameSettings(4, 4, 60, 2500, GameModeSetting);
 
 			switch (returnCode) {
 			case 1:
@@ -112,7 +115,7 @@ public final class Core {
 					startTime = System.currentTimeMillis();
 					boolean bonusLife = gameState.getLevel()
 							% EXTRA_LIFE_FRECUENCY == 0
-							&& gameState.getLivesRemaining() < MAX_LIVES;
+							&& gameState.getLivesRemaining() < MAX_LIVES && GameModeSetting != 2;
 					LOGGER.info("difficulty is " + DifficultySetting);
 					//add variation
 					gameSetting = gameSetting.LevelSettings(gameSetting.getFormationWidth(),
@@ -136,6 +139,8 @@ public final class Core {
 					endTime = System.currentTimeMillis();
 					achievementManager.updatePlaying(gameState.getMaxCombo(),(int) (endTime - startTime) / 1000, MAX_LIVES, gameState.getLivesRemaining(), gameState.getLevel()-1);
 				} while (gameState.getLivesRemaining() > 0);
+
+				// After the game ends
 				achievementManager.updatePlayed(gameState.getAccuracy(), gameState.getScore());
                 achievementManager.updateAllAchievements();
 				LOGGER.info("Starting " + WIDTH + "x" + HEIGHT
@@ -312,6 +317,14 @@ public final class Core {
 
 	public static int getLevelSetting(){
 		return DifficultySetting;
+	}
+
+	public static void setGameModeSetting(final int mode) {
+		GameModeSetting = mode;
+	}
+
+	public static int getGameModeSetting() {
+		return GameModeSetting;
 	}
 
 	/**

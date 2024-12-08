@@ -32,13 +32,16 @@ public class GameSettingScreen extends Screen {
 	private static boolean isMultiplayer = false;
 	/** Difficulty level. */
 	private int difficultyLevel;
+	/** Game mode. */
+	private int gameMode;
 	/** Selected row. */
 	private int selectedRow;
 	/** Time between changes in user selection. */
 	private final Cooldown selectionCooldown;
 
 	/** Total number of rows for selection. */
-	private static final int TOTAL_ROWS = 3; // Multiplayer, Difficulty, Start
+	private static final int TOTAL_ROWS = 4;
+	// 0: Multiplayer, 1: Difficulty, 2: GameMode, 3: Start
 
 	/** Singleton instance of SoundManager */
 	private final SoundManager soundManager = SoundManager.getInstance();
@@ -64,8 +67,10 @@ public class GameSettingScreen extends Screen {
 		// row 1: difficulty level
 		this.difficultyLevel = 1; 	// 0: easy, 1: normal, 2: hard
 
-		// row 3: start
+		// row 2: game mode
+		this.gameMode = 0; 	// 0: Normal, 1: Time Attack, 2: Survival
 
+		// row 3: start
 		this.selectedRow = 0;
 
 		this.selectionCooldown = Core.getCooldown(SELECTION_TIME);
@@ -87,75 +92,88 @@ public class GameSettingScreen extends Screen {
 	 * Updates the elements on screen and checks for events.
 	 */
 	protected final void update() {
-		super.update();
+    super.update();
 
-		draw();
-		if (this.inputDelay.checkFinished() && this.selectionCooldown.checkFinished()) {
-			if (inputManager.isKeyDown(KeyEvent.VK_UP)){
-				this.selectedRow = (this.selectedRow - 1 + TOTAL_ROWS) % TOTAL_ROWS;
+    draw();
+    if (this.inputDelay.checkFinished() && this.selectionCooldown.checkFinished()) {
+        if (inputManager.isKeyDown(KeyEvent.VK_UP)){
+            this.selectedRow = (this.selectedRow - 1 + TOTAL_ROWS) % TOTAL_ROWS;
+            this.selectionCooldown.reset();
+            soundManager.playSound(Sound.MENU_MOVE);
+        } else if (inputManager.isKeyDown(KeyEvent.VK_DOWN)) {
+            this.selectedRow = (this.selectedRow + 1) % TOTAL_ROWS;
+            this.selectionCooldown.reset();
+            soundManager.playSound(Sound.MENU_MOVE);
+        }
+
+        if (this.selectedRow == 0) { // Multiplayer
+            if (inputManager.isKeyDown(KeyEvent.VK_LEFT)) {
+                this.isMultiplayer = false;
+                this.selectionCooldown.reset();
+                soundManager.playSound(Sound.MENU_MOVE);
+            } else if (inputManager.isKeyDown(KeyEvent.VK_RIGHT)) {
+                this.isMultiplayer = true;
+                this.selectionCooldown.reset();
+                soundManager.playSound(Sound.MENU_MOVE);
+            } else if (inputManager.isKeyDown(KeyEvent.VK_BACK_SPACE)) {
+                if (isMultiplayer) {
+                    if (!this.name2.isEmpty()) {
+                        this.name2 = this.name2.substring(0, this.name2.length() - 1);
+                        this.selectionCooldown.reset();
+                        soundManager.playSound(Sound.MENU_TYPING);
+                    }
+                } else {
+                    if (!this.name1.isEmpty()) {
+                        this.name1 = this.name1.substring(0, this.name1.length() - 1);
+                        this.selectionCooldown.reset();
+                        soundManager.playSound(Sound.MENU_TYPING);
+                    }
+                }
+            }
+            handleNameInput(inputManager);
+        } else if (this.selectedRow == 1) { // Difficulty
+            if (inputManager.isKeyDown(KeyEvent.VK_LEFT)) {
+                if (this.difficultyLevel != 0) {
+                    this.difficultyLevel--;
+                    this.selectionCooldown.reset();
+                    soundManager.playSound(Sound.MENU_MOVE);
+                }
+            } else if (inputManager.isKeyDown(KeyEvent.VK_RIGHT)) {
+                if (this.difficultyLevel != 2) {
+                    this.difficultyLevel++;
+                    this.selectionCooldown.reset();
+                    soundManager.playSound(Sound.MENU_MOVE);
+                }
+            }
+        } else if (this.selectedRow == 2) { // Game mode
+            int previouseGameMode = this.gameMode;
+			if(inputManager.isKeyDown(KeyEvent.VK_LEFT) && this.gameMode > 0) {
+				this.gameMode--;
+			} else if(inputManager.isKeyDown(KeyEvent.VK_RIGHT) && this.gameMode < 2) {
+				this.gameMode++;
+			}
+			if (previouseGameMode != this.gameMode) {
+				logger.info("Game mode changed to " + this.gameMode);
 				this.selectionCooldown.reset();
 				soundManager.playSound(Sound.MENU_MOVE);
-			} else if (inputManager.isKeyDown(KeyEvent.VK_DOWN)) {
-				this.selectedRow = (this.selectedRow + 1) % TOTAL_ROWS;
-				this.selectionCooldown.reset();
-				soundManager.playSound(Sound.MENU_MOVE);
 			}
-
-			if (this.selectedRow == 0) {
-				if (inputManager.isKeyDown(KeyEvent.VK_LEFT)) {
-					this.isMultiplayer = false;
-					this.selectionCooldown.reset();
-					soundManager.playSound(Sound.MENU_MOVE);
-				} else if (inputManager.isKeyDown(KeyEvent.VK_RIGHT)) {
-					this.isMultiplayer = true;
-					this.selectionCooldown.reset();
-					soundManager.playSound(Sound.MENU_MOVE);
-				} else if (inputManager.isKeyDown(KeyEvent.VK_BACK_SPACE)) {
-					if (isMultiplayer) {
-						if (!this.name2.isEmpty()) {
-							this.name2 = this.name2.substring(0, this.name2.length() - 1);
-							this.selectionCooldown.reset();
-							soundManager.playSound(Sound.MENU_TYPING);
-						}
-					} else {
-						if (!this.name1.isEmpty()) {
-							this.name1 = this.name1.substring(0, this.name1.length() - 1);
-							this.selectionCooldown.reset();
-							soundManager.playSound(Sound.MENU_TYPING);
-						}
-					}
-				}
-				handleNameInput(inputManager);
-			} else if (this.selectedRow == 1) {
-				if (inputManager.isKeyDown(KeyEvent.VK_LEFT)) {
-					if (this.difficultyLevel != 0) {
-						this.difficultyLevel--;
-						this.selectionCooldown.reset();
-						soundManager.playSound(Sound.MENU_MOVE);
-					}
-				} else if (inputManager.isKeyDown(KeyEvent.VK_RIGHT)) {
-					if (this.difficultyLevel != 2) {
-						this.difficultyLevel++;
-						this.selectionCooldown.reset();
-						soundManager.playSound(Sound.MENU_MOVE);
-					}
-				}
-			} else if (this.selectedRow == 2) {
-				if (inputManager.isKeyDown(KeyEvent.VK_SPACE)) {
-					this.returnCode = isMultiplayer ? 8: 2;
-					this.isRunning = false;
-					soundManager.playSound(Sound.MENU_CLICK);
-				}
-			}
-			if (inputManager.isKeyDown(KeyEvent.VK_ESCAPE)) {
-				// Return to main menu.
-				this.returnCode = 1;
-				this.isRunning = false;
-				soundManager.playSound(Sound.MENU_BACK);
-			}
+        } else if(this.selectedRow == 3) { // Start
+			if (inputManager.isKeyDown(KeyEvent.VK_SPACE)) {
+                this.returnCode = isMultiplayer ? 8 : 2;
+                this.isRunning = false;
+                soundManager.playSound(Sound.MENU_CLICK);
+            }
 		}
 
-	}
+
+        if (inputManager.isKeyDown(KeyEvent.VK_ESCAPE)) {
+            // Return to main menu.
+            this.returnCode = 1;
+            this.isRunning = false;
+            soundManager.playSound(Sound.MENU_BACK);
+        }
+    }
+}
 
 	/**
 	 * Handles the input for player name.
@@ -209,10 +227,11 @@ public class GameSettingScreen extends Screen {
 
 		drawManager.drawGameSettingRow(this, this.selectedRow);
 
-		drawManager.drawGameSettingElements(this, this.selectedRow, isMultiplayer, name1, name2,this.difficultyLevel);
+		drawManager.drawGameSettingElements(this, this.selectedRow, isMultiplayer, name1, name2,this.difficultyLevel, this.gameMode);
 
 		drawManager.completeDrawing(this);
 
 		Core.setLevelSetting(this.difficultyLevel);
+		Core.setGameModeSetting(this.gameMode);
 	}
 }
